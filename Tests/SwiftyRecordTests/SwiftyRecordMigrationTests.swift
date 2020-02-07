@@ -4,27 +4,12 @@ import XCTest
 final class SwiftyRecordMigrationTest: XCTestCase {
     private var schema: SwiftyRecordSchema!
 
-    var usersAndMacrosMigration: SwiftyRecordMigration {
-        SwiftyRecordMigration("create users and macros tables") {
-            CreateTableOperation("users") {
-                TableColumn("name", String.self)
-                TableColumn("age", Int.self)
-                Relationship(.hasMany, "macros", via: "userId")
-            }
-
-            CreateTableOperation("macros") {
-                TableColumn("name", String.self)
-                TableColumn("isEnabled", Bool.self)
-                Relationship(.belongsTo, "user", via: "userId")
-            }
-        }
-    }
-
     override func setUp() {
         super.setUp()
 
-
-        self.schema = SwiftyRecordSchema.schema(fromMigrations: [self.usersAndMacrosMigration])
+        self.schema = SwiftyRecordSchema.schema(
+          fromMigrations: [SwiftyRecordTestHelpers.usersAndMacrosMigration]
+        )
     }
 
     func testTableNames() {
