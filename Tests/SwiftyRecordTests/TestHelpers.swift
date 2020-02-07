@@ -19,8 +19,9 @@ struct SwiftyRecordTestHelpers {
     }()
 
     static var addIsAdminColumnMigration: SwiftyRecordMigration = {
-        SwiftyRecordMigration("Add isAdmin column to users") {
+        SwiftyRecordMigration("Add isAdmin column to users and userId to macros") {
             AddColumnOperation(toTable: "users", named: "isAdmin", ofType: Bool.self)
+            AddColumnOperation(toTable: "macros", named: "userId", ofType: Int.self)
         }
     }()
 
