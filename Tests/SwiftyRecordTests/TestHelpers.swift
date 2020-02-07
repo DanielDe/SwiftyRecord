@@ -39,7 +39,7 @@ struct SwiftyRecordTestHelpers {
     }()
 
     static func setUpConnection() {
-        let databasePath = "/tmp/db.sqlite3"
+        let databasePath = "/tmp/swifty-record-test-db.sqlite3"
         try? FileManager.default.removeItem(atPath: databasePath)
 
         let connection = SwiftyRecordSQLite3Connection.shared
