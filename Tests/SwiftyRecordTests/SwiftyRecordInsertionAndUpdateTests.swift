@@ -25,9 +25,13 @@ final class SwiftyRecordInsertionAndUpdateTests: XCTestCase {
     func testReturnedId() {
         let user = self.testUser
         XCTAssert(user.id == nil)
+        XCTAssert(user.createdAt == nil)
+        XCTAssert(user.updatedAt == nil)
 
         let savedUser = try! user.save()
         XCTAssert(savedUser.id != nil)
+        XCTAssert(savedUser.createdAt != nil)
+        XCTAssert(savedUser.updatedAt != nil)
     }
 
     func testUpdate() {

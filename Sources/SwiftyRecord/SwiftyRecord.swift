@@ -282,8 +282,7 @@ extension SwiftyRecord {
         } else {
             let id = try SwiftyRecordSQLite3Adapter.executeInsertion(forRecord: self, inConnection: self.connection)
 
-            var newRecord = self
-            try! typeInfo(of: type(of: self)).property(named: "id").set(value: id, on: &newRecord)
+            let newRecord = try! Self.findAll(where: ["id" === id]).first()!
             try! newRecord.hydrateRelationships(withConnection: self.connection)
 
             return newRecord
