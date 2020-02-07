@@ -367,8 +367,10 @@ class SwiftyRecordSQLite3Connection: SwiftyRecordDatabaseConnection {
         try migrations.filter { migration in
             !alreadyRunMigrationVersions.contains(migration.name)
         }.forEach { migration in
-            try migration.operations.forEach { operation in
-                try self.connection.execute(operation.sql)
+            try migration.operations.compactMap { operation in
+                operation.sql
+            }.forEach { sql in
+                try self.connection.execute(sql)
             }
 
             try self.insertMigration(version: migration.name)

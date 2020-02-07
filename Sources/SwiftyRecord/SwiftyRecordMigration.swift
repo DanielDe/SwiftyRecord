@@ -33,7 +33,7 @@ struct CreateTableOperationBuilder {
 }
 
 protocol MigrationOperation {
-    var sql: String { get }
+    var sql: String? { get }
 }
 
 struct CreateTableOperation: MigrationOperation {
@@ -79,13 +79,13 @@ struct CreateTableOperation: MigrationOperation {
         }
     }
 
-    var sql: String {
+    var sql: String? {
         """
           CREATE TABLE \(self.tableName) (
             id INTEGER PRIMARY KEY,
             createdAt TEXT,
             updatedAt TEXT,
-            \(self.columns.map { $0.sql }.joined(separator: ",\n   "))
+            \(self.columns.compactMap { $0.sql }.joined(separator: ",\n   "))
           )
         """
     }
@@ -102,7 +102,7 @@ struct TableColumn: TableCreationSubOperation {
         self.columnType = columnType
     }
 
-    var sql: String {
+    var sql: String? {
         "\(self.columnName) \(SwiftyRecordSQLite3Adapter.typeName(forType: self.columnType))"
     }
 }
@@ -135,7 +135,7 @@ struct AddColumnOperation: MigrationOperation {
         self.columnType = columnType
     }
 
-    var sql: String {
+    var sql: String? {
         """
           ALTER TABLE \(self.tableName)
            ADD COLUMN \(self.columnName) \(SwiftyRecordSQLite3Adapter.typeName(forType: self.columnType))
@@ -156,10 +156,7 @@ struct AddRelationshipOperation: MigrationOperation {
         self.foreignKeyName = foreignKeyName
     }
 
-    var sql: String {
-        """
-          """
-    }
+    var sql: String? = nil
 }
 
 class Table {
