@@ -298,6 +298,10 @@ extension SwiftyRecord {
 }
 
 extension SwiftyRecord {
+    static func find(_ id: Int64) throws -> Self {
+        try Self.findAll(where: ["id" === id]).first()!
+    }
+
     static func findAll(where filters: [SwiftyRecordFilter] = []) -> SwiftyRecordCollection<Self> {
         // TODO: check the type names for properties that exist on Self.
 

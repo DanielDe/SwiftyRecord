@@ -21,6 +21,10 @@ final class SwiftyRecordQueryTests: XCTestCase {
         }
     }
 
+    func testFindById() {
+        XCTAssertEqual(try! User.find(1).name, "Winnie Harvey")
+    }
+
     func testQueryAll() {
         XCTAssertEqual(try! User.findAll().count(), 5)
     }
