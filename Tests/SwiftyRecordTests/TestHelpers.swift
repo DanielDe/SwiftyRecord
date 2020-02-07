@@ -18,10 +18,23 @@ struct SwiftyRecordTestHelpers {
         }
     }()
 
-    static var addIsAdminColumnMigration: SwiftyRecordMigration = {
+    static var addColumnsMigrations: SwiftyRecordMigration = {
         SwiftyRecordMigration("Add isAdmin column to users and userId to macros") {
             AddColumnOperation(toTable: "users", named: "isAdmin", ofType: Bool.self)
             AddColumnOperation(toTable: "macros", named: "userId", ofType: Int.self)
+        }
+    }()
+
+    static var addActionsMigration: SwiftyRecordMigration = {
+        SwiftyRecordMigration("add actions table and relationships") {
+            CreateTableOperation("actions") {
+                TableColumn("actionType", String.self)
+                TableColumn("order", Int.self)
+                TableColumn("macroId", Int.self)
+                Relationship(.belongsTo, "macro", via: "macroId")
+            }
+
+            AddRelationshipOperation(.hasMany, named: "actions", toTable: "macros", via: "macroId")
         }
     }()
 
@@ -34,7 +47,7 @@ struct SwiftyRecordTestHelpers {
         try! connection.prepareDatabase(
           withMigrations: [
             SwiftyRecordTestHelpers.usersAndMacrosMigration,
-            SwiftyRecordTestHelpers.addIsAdminColumnMigration
+            SwiftyRecordTestHelpers.addColumnsMigrations
           ]
         )
     }
@@ -47,6 +60,7 @@ struct User: SwiftyRecord {
     var name: String
     var age: Int64
     var isAdmin: Bool
+
     var createdAt: Date?
     var updatedAt: Date?
 
@@ -60,8 +74,24 @@ struct Macro: SwiftyRecord {
     var name: String
     var isEnabled: Bool
     var userId: Int64
+
     var createdAt: Date?
     var updatedAt: Date?
 
     @BelongsTo var user: User?
+    @HasMany var actions: SwiftyRecordCollection<Action>
+}
+
+struct Action: SwiftyRecord {
+    static let tableName = "actions"
+
+    let id: Int64? = nil
+    var actionType: String
+    var order: Int64
+    var macroId: Int64
+
+    var createdAt: Date?
+    var updatedAt: Date?
+
+    @BelongsTo var macro: Macro?
 }

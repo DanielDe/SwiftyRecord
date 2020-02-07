@@ -143,6 +143,25 @@ struct AddColumnOperation: MigrationOperation {
     }
 }
 
+struct AddRelationshipOperation: MigrationOperation {
+    let relationshipType: RelationshipType
+    let relationshipName: String
+    let tableName: String
+    let foreignKeyName: String
+
+    init(_ relationshipType: RelationshipType, named relationshipName: String, toTable tableName: String, via foreignKeyName: String) {
+        self.relationshipType = relationshipType
+        self.relationshipName = relationshipName
+        self.tableName = tableName
+        self.foreignKeyName = foreignKeyName
+    }
+
+    var sql: String {
+        """
+          """
+    }
+}
+
 class Table {
     var name: String
     var columns: [TableColumn]
@@ -177,6 +196,15 @@ class SwiftyRecordSchema: CustomStringConvertible {
                 case let operation as AddColumnOperation:
                     let table = tablesMap[operation.tableName]!
                     table.columns += [TableColumn(operation.columnName, operation.columnType)]
+                case let operation as AddRelationshipOperation:
+                    let table = tablesMap[operation.tableName]!
+                    table.relationships += [
+                      Relationship(
+                        operation.relationshipType,
+                        operation.relationshipName,
+                        via: operation.foreignKeyName
+                      )
+                    ]
                 default:
                     fatalError("Unhandled migration operation type in schema generation")
                 }
