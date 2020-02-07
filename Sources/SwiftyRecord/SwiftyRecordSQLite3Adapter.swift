@@ -232,18 +232,6 @@ extension SwiftyRecordSQLite3Adapter {
         return SelectQueryResult(columnNames: queryResult.columnNames, results: results)
     }
 
-    static func executeDeleteQuery(forRecord record: SwiftyRecord, inConnection connection: SwiftyRecordSQLite3Connection) throws {
-        guard let recordId = record.id else { return }
-
-        let recordType = type(of: record)
-
-        let query = "DELETE FROM \(recordType.tableName) WHERE id = ?"
-        print(">> \(query), [\(recordId)]")
-
-        let statement = try connection.connection.prepare(query)
-        try statement.run([recordId])
-    }
-
     static func executeCountQuery<RecordType: SwiftyRecord>(
         forCollection collection: SwiftyRecordCollection<RecordType>,
         inConnection connection: SwiftyRecordSQLite3Connection
@@ -287,6 +275,22 @@ extension SwiftyRecordSQLite3Adapter {
 
         let statement = try connection.connection.prepare(query)
         try statement.run(bindings.map { $0.bindableValue })
+    }
+
+    static func executeDeleteQuery<RecordType: SwiftyRecord>(
+      forCollection collection: SwiftyRecordCollection<RecordType>,
+      inConnection connection: SwiftyRecordSQLite3Connection
+    ) throws {
+        let whereQueryPart = try SwiftyRecordSQLite3Adapter.whereQueryPart(
+            forCollection: collection,
+          inConnection: connection
+        )
+
+        let query = "DELETE FROM \(RecordType.tableName) \(whereQueryPart.whereClause)"
+        print(">> \(query), \(whereQueryPart.valueBindings)")
+
+        let statement = try connection.connection.prepare(query)
+        try statement.run(whereQueryPart.valueBindings.map { $0.bindableValue })
     }
 }
 

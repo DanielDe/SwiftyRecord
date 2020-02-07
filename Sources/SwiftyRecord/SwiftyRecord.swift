@@ -291,7 +291,10 @@ extension SwiftyRecord {
     }
 
     func destroy() throws {
-        try SwiftyRecordSQLite3Adapter.executeDeleteQuery(forRecord: self, inConnection: self.connection)
+        guard let recordId = self.id else {
+            fatalError("destroy() called on a record without an id")
+        }
+        try Self.findAll(where: ["id" === recordId]).destroyAll()
     }
 }
 
@@ -329,6 +332,10 @@ extension SwiftyRecord {
 
     static func last(_ numRecords: Int = 1) throws -> [Self] {
         try Self.findAll().last(numRecords)
+    }
+
+    static func destroyAll() throws {
+        try Self.findAll().destroyAll()
     }
 }
 
@@ -394,6 +401,10 @@ struct SwiftyRecordCollection<ElementType: SwiftyRecord> {
 
     func last(_ numRecords: Int = 1) throws -> [ElementType] {
         try self.reversed().limit(numRecords).execute()
+    }
+
+    func destroyAll() throws {
+        try SwiftyRecordSQLite3Adapter.executeDeleteQuery(forCollection: self, inConnection: self.connection)
     }
 
     func execute() throws -> [ElementType] {
